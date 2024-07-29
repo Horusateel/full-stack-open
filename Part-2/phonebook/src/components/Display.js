@@ -1,5 +1,12 @@
-const Display = ({ persons }) => {
-    const allPersons = persons.map(ele => <div key={ele.name}>{ele.name} {ele.number}</div>)
+const Display = ({ persons, handleDelete }) => {
+    const allPersons = persons.map(ele => {
+        return (
+            <div key={ele.name}>
+                {ele.name} {ele.number}
+                <button onClick={() => handleDelete(ele.id)}>delete</button>
+            </div>
+        )
+    })
 
     return (
         <>

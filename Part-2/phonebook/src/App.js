@@ -3,7 +3,7 @@ import { isEqual } from 'lodash'
 import Search from './components/Search'
 import New from './components/New'
 import Display from './components/Display'
-import axios from 'axios'
+import services from './services/notes'
 
 const App = () => {
   // States
@@ -15,10 +15,10 @@ const App = () => {
 
   // fetching data
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
+    services
+      .getAll()
       .then(res => {
-        setPersons(res.data)
+        setPersons(res)
       })
   }, [])
 
@@ -33,18 +33,50 @@ const App = () => {
   const handleSubmit = (event) => {
     event.preventDefault()
     if (persons.some(ele => isEqual(newName, ele.name))) {
-      alert(`${newName} already exists`)
+      if (window.confirm(
+        `${newName} is already added, replace the old number with a new one?`
+      )) {
+        const id = persons.find(ele => ele.name === newName).id
+        const updatedObj = {
+          ...persons.find(ele => ele.name === newName),
+          number: newNumber
+        }
+        setPersons(prev => prev.map(ele => ele.id === id ? updatedObj : ele))
+        services
+          .update(id, updatedObj)
+          .then(res => res)
+        setNewName('')
+        setNewNumber('')
+      } else {
+        setNewName('')
+        setNewNumber('')
+      }
     } else {
-      setPersons(prev => [
-        ...prev,
-        { name: newName, number: newNumber}
-      ])
+      const newObj = {
+        name: newName,
+        number: newNumber
+      }
+      setPersons(prev => [...prev, newObj])
+      services
+        .create(newObj)
+        .then(res => res)
       setNewName('')
       setNewNumber('')
     }
   }
   const handleSearch = (event) => {
     setSearchName(event.target.value)
+  }
+  const handleDelete = (id) => {
+    if (window.confirm(`Delete ${persons.find(ele => ele.id === id).name}?`)) {
+      // from server
+      services
+        .deleteItem(id)
+        .then(res => res)
+
+      // from react
+      setPersons(prev => prev.filter(ele => ele.id !== id))
+    }
   }
 
 
@@ -61,7 +93,7 @@ const App = () => {
         handleNumber={handleNumber}
       />
       <h2>Numbers</h2>
-      <Display persons={persons} />
+      <Display persons={persons} handleDelete={handleDelete}/>
     </div>
   )
 }
