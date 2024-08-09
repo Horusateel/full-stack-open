@@ -9,6 +9,7 @@ import services from './services/notes'
 const App = () => {
   // States
   const [persons, setPersons] = useState([])
+  const [filtered, setFiltered] = useState([])
   const [newContact, setNewContact] = useState({name: '', number: ''})
   const [searchName, setSearchName] = useState('')
   const [successMessage, setSuccessMessage] = useState("Successful request")
@@ -79,6 +80,7 @@ const App = () => {
   }
   const handleSearch = (event) => {
     setSearchName(event.target.value)
+    setFiltered(persons.filter(ele => ele.name.toLowerCase().startsWith(event.target.value.toLowerCase())))
   }
   const handleDelete = (id) => {
     if (window.confirm(`Delete ${persons.find(ele => ele.id === id).name}?`)) {
@@ -105,7 +107,11 @@ const App = () => {
         handleContact={handleContact}
       />
       <h2>Numbers</h2>
-      <Display persons={persons} handleDelete={handleDelete}/>
+      <Display
+        persons={persons}
+        handleDelete={handleDelete}
+        filtered={filtered}
+      />
     </div>
   )
 }
