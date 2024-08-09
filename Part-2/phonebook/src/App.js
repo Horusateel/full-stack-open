@@ -27,14 +27,9 @@ const App = () => {
 
   // Event handling
   const handleContact = (event) => {
-    event.target.name === "name"
-    ? setNewContact(prev => ({
+    setNewContact(prev => ({
       ...prev,
-      name: event.target.value
-    }))
-    : setNewContact(prev => ({
-      ...prev,
-      number: event.target.value
+      [event.target.name === "name" ? "name" : "number"]: event.target.value
     }))
   }
   const handleSubmit = (event) => {
