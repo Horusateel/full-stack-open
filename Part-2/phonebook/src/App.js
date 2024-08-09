@@ -3,14 +3,15 @@ import { isEqual } from 'lodash'
 import Search from './components/Search'
 import New from './components/New'
 import Display from './components/Display'
+import Notification from './components/Notification'
 import services from './services/notes'
 
 const App = () => {
   // States
   const [persons, setPersons] = useState([])
-  const [newName, setNewName] = useState('')
-  const [newNumber, setNewNumber] = useState('')
+  const [newContact, setNewContact] = useState({name: '', number: ''})
   const [searchName, setSearchName] = useState('')
+  const [successMessage, setSuccessMessage] = useState("Successful request")
 
 
   // fetching data
@@ -24,44 +25,56 @@ const App = () => {
 
 
   // Event handling
-  const handleName = (event) => {
-    setNewName(event.target.value)
-  }
-  const handleNumber = (event) => {
-    setNewNumber(event.target.value)
+  const handleContact = (event) => {
+    event.target.name === "name"
+    ? setNewContact(prev => ({
+      ...prev,
+      name: event.target.value
+    }))
+    : setNewContact(prev => ({
+      ...prev,
+      number: event.target.value
+    }))
   }
   const handleSubmit = (event) => {
     event.preventDefault()
-    if (persons.some(ele => isEqual(newName, ele.name))) {
+    if (persons.some(ele => isEqual(newContact.name, ele.name))) {
       if (window.confirm(
-        `${newName} is already added, replace the old number with a new one?`
+        `${newContact.name} is already added, replace the old number with a new one?`
       )) {
-        const id = persons.find(ele => ele.name === newName).id
+        const id = persons.find(ele => ele.name === newContact.name).id
         const updatedObj = {
-          ...persons.find(ele => ele.name === newName),
-          number: newNumber
+          ...persons.find(ele => ele.name === newContact.name),
+          number: newContact.number
         }
         setPersons(prev => prev.map(ele => ele.id === id ? updatedObj : ele))
         services
           .update(id, updatedObj)
-          .then(res => res)
-        setNewName('')
-        setNewNumber('')
+          .then(res => {
+            setSuccessMessage(`${newContact.name} contact was updated`)
+            setTimeout(() => {
+              setSuccessMessage(null)
+            }, 5000)
+          })
+        setNewContact({name: '', number: ''})
       } else {
-        setNewName('')
-        setNewNumber('')
+        setNewContact({name: '', number: ''})
       }
     } else {
       const newObj = {
-        name: newName,
-        number: newNumber
+        name: newContact.name,
+        number: newContact.number
       }
       setPersons(prev => [...prev, newObj])
       services
         .create(newObj)
-        .then(res => res)
-      setNewName('')
-      setNewNumber('')
+        .then(res => {
+          setSuccessMessage(`${newContact.name} contact was added`)
+          setTimeout(() => {
+            setSuccessMessage(null)
+          }, 5000)
+        })
+        setNewContact({name: '', number: ''})
     }
   }
   const handleSearch = (event) => {
@@ -83,14 +96,13 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={successMessage}/>
       <Search searchName={searchName} handleSearch={handleSearch}/>
       <h2>Add new name</h2>
-      <New
+      <New 
         handleSubmit={handleSubmit}
-        newName={newName}
-        handleName={handleName}
-        newNumber={newNumber}
-        handleNumber={handleNumber}
+        newContact={newContact}
+        handleContact={handleContact}
       />
       <h2>Numbers</h2>
       <Display persons={persons} handleDelete={handleDelete}/>
