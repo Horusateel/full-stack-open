@@ -12,7 +12,7 @@ const App = () => {
   const [filtered, setFiltered] = useState([])
   const [newContact, setNewContact] = useState({name: '', number: ''})
   const [searchName, setSearchName] = useState('')
-  const [successMessage, setSuccessMessage] = useState("Successful request")
+  const [successMessage, setSuccessMessage] = useState(null)
 
 
   // fetching data
@@ -70,7 +70,7 @@ const App = () => {
             setSuccessMessage(null)
           }, 5000)
         })
-        setNewContact({name: '', number: ''})
+      setNewContact({name: '', number: ''})
     }
   }
   const handleSearch = (event) => {
@@ -93,7 +93,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={successMessage}/>
+      <Notification successMessage={successMessage}/>
       <Search searchName={searchName} handleSearch={handleSearch}/>
       <h2>Add new name</h2>
       <New 
