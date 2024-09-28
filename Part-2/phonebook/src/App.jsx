@@ -12,7 +12,7 @@ const App = () => {
   const [filtered, setFiltered] = useState([])
   const [newContact, setNewContact] = useState({name: '', number: ''})
   const [searchName, setSearchName] = useState('')
-  const [successMessage, setSuccessMessage] = useState(null)
+  const [message, setMessage] = useState(null)
 
 
   // fetching data
@@ -47,9 +47,15 @@ const App = () => {
         services
           .update(id, updatedObj)
           .then(res => {
-            setSuccessMessage(`${newContact.name} contact was updated`)
+            setMessage(`${newContact.name} contact was updated`)
             setTimeout(() => {
-              setSuccessMessage(null)
+              setMessage(null)
+            }, 5000)
+          })
+          .catch(err => {
+            setMessage(`${newContact.name}'s information has been already removed`)
+            setTimeout(() => {
+              setMessage(null)
             }, 5000)
           })
         setNewContact({name: '', number: ''})
@@ -65,9 +71,9 @@ const App = () => {
       services
         .create(newObj)
         .then(res => {
-          setSuccessMessage(`${newContact.name} contact was added`)
+          setMessage(`${newContact.name} contact was added`)
           setTimeout(() => {
-            setSuccessMessage(null)
+            setMessage(null)
           }, 5000)
         })
       setNewContact({name: '', number: ''})
@@ -93,7 +99,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification successMessage={successMessage}/>
+      <Notification message={message}/>
       <Search searchName={searchName} handleSearch={handleSearch}/>
       <h2>Add new name</h2>
       <New 
