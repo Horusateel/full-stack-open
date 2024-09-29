@@ -57,7 +57,17 @@ const App = () => {
       </>
     )
   } else {
-    const list = filtered.map(ele => <div key={ele.name.common}>{ele.name.common}</div>)
+    const handleChoose = (event) => {
+      setFiltered(countries.filter(ele => ele.name.common.toLowerCase().includes(event.target.value.toLowerCase())))
+    }
+    const list = filtered.map(ele => {
+      return (
+        <div key={ele.name.common}>
+          {ele.name.common}
+          <button onClick={handleChoose} value={ele.name.common}>show</button>
+        </div>
+      )
+    })
 
     return (
       <>
